@@ -1,36 +1,22 @@
-import React from "react";
 // import PropTypes from "prop-types";
-/*[
-  { x: 0, y: -1, z: 1, value: 2 },
-  { x: 0, y: 1, z: -1, value: 2 },
-  { x: 1, y: -1, z: 0, value: 2 },
-];*/
-const Board = ({ cells, radius }) => {
+
+const Board = ({ cells, level }) => {
   const boardWidth = parseInt(
       getComputedStyle(document.documentElement).getPropertyValue(
           "--board-width"
       )
   );
 
-  console.log(boardWidth);
-
-  const hexagonSize = boardWidth / (radius * 2 + (radius - 1));
+  const hexagonSize = boardWidth / (level * 2 + (level - 1));
   const hexagonWidth =  hexagonSize * 2;
   const hexagonHeight = Math.sqrt(3) / 2 * hexagonWidth;
 
-  const getCellOffset = ({ x, y, z }) => {
-
-  };
-
-  // const getHexagonStyles = () => {
-  //   return
-  // };
-
   return (
-    <div className="board">
+    <section className="board" aria-label="Game Board">
       {cells.map(({x, y, z, value}, index) => (
         <div
             className="board__cell"
+            aria-label={`Game cell – x:${x}, y: ${y}, z: ${z}, value: ${value}`}
             data-x={x}
             data-y={y}
             data-z={z}
@@ -45,7 +31,7 @@ const Board = ({ cells, radius }) => {
           {value}
         </div>
       ))}
-    </div>
+    </section>
   );
 };
 
