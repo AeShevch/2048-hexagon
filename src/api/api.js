@@ -32,11 +32,15 @@ export default class API {
   /**
    * Запрос новых ячеек для поля с указанным радиусом
    * @param {Number} level - Радиус поля (Уровень игры)
+   * @param {Array} currentBoardData - Радиус поля (Уровень игры)
    * @returns {Promise<any>}
    */
-  getNewCellsForGameLevel(level) {
-    return this._load({ url: level.toString(), headers: new Headers({mode:'no-cors', 'Access-Control-Allow-Origin': '*'}) })
-        .then((response) => response.json());
+  getNewCellsForGameLevel(level, currentBoardData = []) {
+    return this._load({
+      url: level.toString(),
+      method: Method.POST,
+      body: JSON.stringify(currentBoardData),
+    }).then((response) => response.json());
   }
 
   /**
