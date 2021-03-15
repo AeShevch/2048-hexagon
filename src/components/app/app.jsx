@@ -3,13 +3,42 @@ import React, { useState, useEffect } from "react";
 import API from "../../api/api";
 import Board from "../board/board";
 import Settings from "../settings/settings";
-import {generateInitialBoardData} from "../utils/utils";
+import { generateInitialBoardData, isControlKey } from "../../utils/utils";
 import servers from "./servers";
 
 const App = () => {
   const [level, setLevel] = useState(0);
   const [cells, setCells] = useState([]);
   const [backendServers, setSelectedBackendServer] = useState(servers);
+
+  const getCellsGroupedByCoordinate = (axis, cells) => {
+    return cells.reduce((acc, cell) => {
+      const axisCoordinate = cell[axis];
+
+      if (!acc[axisCoordinate]) {
+        acc[axisCoordinate] = [];
+      }
+
+      return {
+        ...acc,
+        [axisCoordinate]: [
+          ...acc[axisCoordinate],
+          cell
+        ]
+      }
+    }, {});
+  }
+
+  const shiftCells = (axis, direction) => {
+    const lines = getCellsGroupedByCoordinate(axis);
+
+    // lines.forEach((line))
+
+  };
+
+  const onKeyDown = (keyCode) => {
+    isControlKey(keyCode, (axis, direction) => shiftCells(axis, direction));
+  };
 
   const getUpdatedCells = (currentCells, newCells) => {
     if (!currentCells.length) currentCells = generateInitialBoardData(level);
@@ -55,14 +84,18 @@ const App = () => {
   }, [backendServers, level]);
 
   return (
-    <div className="game">
+    <section
+      tabIndex={0}
+      onKeyDown={({ code }) => onKeyDown(code)}
+      className="game"
+    >
       <Settings
         backendServers={backendServers}
         onServerChange={updateBackendServer}
         onLevelChange={setLevel}
       />
       {!!level && <Board cells={cells} level={level} />}
-    </div>
+    </section>
   );
 };
 

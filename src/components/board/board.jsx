@@ -1,7 +1,9 @@
+// import {useEffect, useRef} from 'react'
 // import PropTypes from "prop-types";
 import Cell from "./cell/cell";
 
 const Board = ({cells, level}) => {
+  // const boardElement = useRef(null);
   const boardWidth = parseInt(
     getComputedStyle(document.documentElement).getPropertyValue(
       "--board-width"
@@ -12,8 +14,13 @@ const Board = ({cells, level}) => {
   const hexagonWidth = hexagonSize * 2;
   const hexagonHeight = Math.sqrt(3) / 2 * hexagonWidth;
 
+  // useEffect(() => {
+  //   boardElement.current.focus();
+  // }, []);
+
   return (
-    <section className="board" aria-label="Game Board">
+    <section
+      className="board" aria-label="Game Board">
       {cells.map(({x, y, z, value}, index) => (
         <Cell
           x={x} y={y} z={z} value={value}
