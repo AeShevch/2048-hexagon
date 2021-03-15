@@ -30,8 +30,9 @@ const App = () => {
   }
 
   const shiftCells = (axis, direction) => {
-    const lines = getCellsGroupedByCoordinate(axis);
+    const lines = getCellsGroupedByCoordinate(axis, cells);
 
+    console.log(lines);
     // lines.forEach((line))
 
   };
