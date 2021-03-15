@@ -4,7 +4,7 @@ import API from "../../api/api";
 import Board from "../board/board";
 import Settings from "../settings/settings";
 import { generateInitialBoardData, isControlKey } from "../../utils/utils";
-import servers from "./servers";
+import servers from "../../api/servers";
 
 const App = () => {
   const [level, setLevel] = useState(0);
