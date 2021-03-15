@@ -3,21 +3,10 @@ import React, { useState, useEffect } from "react";
 import API from "../../api/api";
 import Board from "../board/board";
 import Settings from "../settings/settings";
+import {generateInitialBoardData} from "../utils/utils";
 
 const App = () => {
-  const generateInitialBoardData = (level) => {
-    const results = [];
-    const n = level - 1;
 
-    for (let x = -n; x <= n; x++) {
-      for (let y = Math.max(-n, -x - n); y <= Math.min(n, -x + n); y++) {
-        const z = -x - y;
-        results.push({ x, y, z, value: 0 });
-      }
-    }
-
-    return results;
-  };
 
   const [level, setLevel] = useState(0);
   const [cells, setCells] = useState([]);
