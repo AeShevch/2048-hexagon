@@ -12,7 +12,7 @@ const App = () => {
   const [backendServers, setSelectedBackendServer] = useState(servers);
 
   const getCellsGroupedByCoordinate = (axis, cells) => {
-    return cells.reduce((acc, cell) => {
+    const groupedCells = cells.reduce((acc, cell) => {
       const axisCoordinate = cell[axis];
 
       if (!acc[axisCoordinate]) {
@@ -27,18 +27,68 @@ const App = () => {
         ]
       }
     }, {});
+
+    return Object.values(groupedCells);
   }
 
-  const shiftCells = (axis, direction) => {
-    const lines = getCellsGroupedByCoordinate(axis, cells);
+  const getLineCellsValues = (line) =>
+    line.reduce((accum, { value }) => {
+      if (value) {
+        accum.push(value);
+      }
+      return accum;
+    }, []);
 
+  const sumEqualSiblings = (values) => {
+    const result = values;
+    result.forEach((value, i) => {
+      if (i && value === result[i - 1]) {
+        result[i - 1]+= value;
+        result[i] = 0;
+      }
+    });
+
+    return result;
+  };
+
+  const removeZeroes = (array) => array.filter(value => value);
+
+  const shiftBoard = (axis, direction) => {
+    const lines = getCellsGroupedByCoordinate(axis, cells);
     console.log(lines);
-    // lines.forEach((line))
+
+    lines.forEach((line, indexLine) => {
+      const isToEndDirection = direction === `end`;
+      let values = getLineCellsValues(line);
+      if (values.length) {
+        if (!isToEndDirection) values = values.reverse();
+        values = sumEqualSiblings(values);
+        if (!isToEndDirection) values = values.reverse();
+
+        const valuesWithoutZeroes = removeZeroes(values);
+        const missingZeros = new Array(line.length - values.length).fill(0);
+
+        let resultValues = [...valuesWithoutZeroes, ...missingZeros];
+
+        if (isToEndDirection) {
+          resultValues = [...missingZeros, ...valuesWithoutZeroes];
+        }
+
+        resultValues.forEach((value, indexValue) => {
+          lines[indexLine][indexValue].value = value;
+        });
+      }
+
+      setCells(lines.flat());
+    });
 
   };
 
   const onKeyDown = (keyCode) => {
-    isControlKey(keyCode, (axis, direction) => shiftCells(axis, direction));
+    isControlKey(keyCode, (axis, direction) => {
+      shiftBoard(axis, direction);
+
+    });
   };
 
   const getUpdatedCells = (currentCells, newCells) => {
@@ -89,6 +139,8 @@ const App = () => {
       tabIndex={0}
       onKeyDown={({ code }) => onKeyDown(code)}
       className="game"
+      role="application"
+      aria-label="Hexagonal 2048"
     >
       <Settings
         backendServers={backendServers}

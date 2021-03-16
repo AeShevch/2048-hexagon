@@ -1,32 +1,43 @@
 :root {
-  --board-width: 500px;
+  --board-width: 35em;
+}
+
+body {
+  font: 1rem/1.4 -apple-system, BlinkMacSystemFont, 'Roboto', 'Helvetica Neue', Geneva, "Noto Sans Armenian", "Noto Sans Bengali", "Noto Sans Cherokee", "Noto Sans Devanagari", "Noto Sans Ethiopic", "Noto Sans Georgian", "Noto Sans Hebrew", "Noto Sans Kannada", "Noto Sans Khmer", "Noto Sans Lao", "Noto Sans Osmanya", "Noto Sans Tamil", "Noto Sans Telugu", "Noto Sans Thai", sans-serif, arial, Tahoma, verdana;;
 }
 
 .board {
-  width: 500px;
-  height: 500px;
   position: relative;
+  width: 35em;
+  height: 35em;
 
   &__cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     position: absolute;
-    background-color: #eaeaea;
-    inset: 0;
     margin: auto;
-    transition: .3s ease-in-out;
+    background-color: #999ede;
+    inset: 0;
+    color: #fff;
+    font-size: 25px;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
 
-
-   &, &:after {
-     clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
-   }
+    &, &:after {
+      clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+    }
 
     &:after {
       position: absolute;
-      inset: 2px;
-      background-color: #fff;
       display: flex;
-      align-items: center;
       justify-content: center;
-      content: attr(data-value);
+      align-items: center;
+      background-color: #000;
+      content: '';
+      inset: 2px;
+      mix-blend-mode: overlay;
+      pointer-events: none;
     }
   }
 }
