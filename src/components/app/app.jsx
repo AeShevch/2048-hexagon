@@ -11,6 +11,8 @@ const App = () => {
   const [cells, setCells] = useState([]);
   const [backendServers, setSelectedBackendServer] = useState(servers);
 
+  let api = new API(backendServers.find((server) => server.isSelected).value);
+
   const getCellsGroupedByCoordinate = (axis, cells) => {
     const groupedCells = cells.reduce((acc, cell) => {
       const axisCoordinate = cell[axis];
@@ -30,6 +32,10 @@ const App = () => {
 
     return Object.values(groupedCells);
   }
+
+  const sortByDirection = (line, direction) => {
+    return line.sort((a, b) => a[direction] - b[direction]);
+  };
 
   const getLineCellsValues = (line) =>
     line.reduce((accum, { value }) => {
@@ -54,34 +60,43 @@ const App = () => {
   const removeZeroes = (array) => array.filter(value => value);
 
   const shiftBoard = (axis, direction) => {
+    // Получениям ячейки, группированные по линиям нужных направлений
     const lines = getCellsGroupedByCoordinate(axis, cells);
-    console.log(lines);
+    const tmp = lines.slice();
+    console.log("line Before", tmp);
 
+    // Проходим по каждой линии
     lines.forEach((line, indexLine) => {
-      const isToEndDirection = direction === `end`;
-      let values = getLineCellsValues(line);
+      const isToEndDirection = direction === `start`;
+      // Получеем массив value каждой ячейки в линии (Без нулей)
+      let values = getLineCellsValues(sortByDirection(line, direction));
+      // Если хотя бы в одной ячейки в линии есть value
       if (values.length) {
-        if (!isToEndDirection) values = values.reverse();
-        values = sumEqualSiblings(values);
-        if (!isToEndDirection) values = values.reverse();
+        // Складываем значения соседних ячеек TODO Правильно ли складывает? НЕПРАВИЛЬНО!
+        // values = sumEqualSiblings(values);
 
+        // После сложения, появились нулевые value => убираем их
         const valuesWithoutZeroes = removeZeroes(values);
+        // Собираем недостающие нули в массив
         const missingZeros = new Array(line.length - values.length).fill(0);
 
-        let resultValues = [...valuesWithoutZeroes, ...missingZeros];
+        // Собираем новый массив value. В зависимости от направления, добавляем нули в конец или начало
+        let resultValues = [...missingZeros, ...valuesWithoutZeroes];
 
-        if (isToEndDirection) {
-          resultValues = [...missingZeros, ...valuesWithoutZeroes];
-        }
-
+        // Обновляем исходный массив ячеек новыми value indexValue равен индексу ячейки
         resultValues.forEach((value, indexValue) => {
           lines[indexLine][indexValue].value = value;
         });
       }
-
-      setCells(lines.flat());
     });
 
+    const tmp2 = lines.slice();
+    // console.log("line Before", tmp2);
+
+    console.log("line After", lines);
+    // TODO Отправляем на сервер обновлённые ячейки, ожидая получить новые, но почему-то получаем не всегда
+    // updateBoardFromServer(lines.flat());
+    setCells(lines.flat());
   };
 
   const onKeyDown = (keyCode) => {
@@ -110,7 +125,6 @@ const App = () => {
     });
   };
 
-  let api = new API(backendServers.find((server) => server.isSelected).value);
 
   const updateBoardFromServer = (currentCells = []) => {
     api.getNewCellsForGameLevel(level, currentCells).then((newCells) => {

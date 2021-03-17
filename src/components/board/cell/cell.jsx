@@ -17,7 +17,7 @@ const Cell = ({x, y, z, value, width, height}) => {
         // Сдвиг от центра доски
         transform: `translateY(${cellShiftVertical}em) translateX(${cellShiftHorizontal}em)`
       }}
-    >{cellValue}</div>
+    ><b style={{color: 'red'}}>{cellValue}</b>&nbsp; x: {x}, y: {y}, z: {z}</div>
   )
 }
 

@@ -15,27 +15,27 @@ export const generateInitialBoardData = (level) => {
 const keyCodeToAxis = {
   "KeyQ": {
     name: "z",
-    direction: "start"
+    direction: "y"
   },
   "KeyW": {
     name: "x",
-    direction: "start"
+    direction: "y"
   },
   "KeyE": {
     name: "y",
-    direction: "start"
+    direction: "x"
   },
   "KeyA": {
     name: "y",
-    direction: "end"
+    direction: "z"
   },
   "KeyS": {
     name: "x",
-    direction: "end"
+    direction: "z"
   },
   "KeyD": {
     name: "z",
-    direction: "end"
+    direction: "x"
   },
 };
 

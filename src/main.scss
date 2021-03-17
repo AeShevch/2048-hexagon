@@ -8,8 +8,9 @@ body {
 
 .board {
   position: relative;
-  width: 35em;
-  height: 35em;
+  width: var(--board-width);
+  height: 37em;
+  margin: auto;
 
   &__cell {
     display: flex;
@@ -20,7 +21,6 @@ body {
     background-color: #999ede;
     inset: 0;
     color: #fff;
-    font-size: 25px;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
 
