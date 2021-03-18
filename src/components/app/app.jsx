@@ -46,13 +46,17 @@ const App = () => {
     }, []);
 
   const sumEqualSiblings = (values) => {
-    const result = values;
-    result.forEach((value, i) => {
-      if (i && value === result[i - 1]) {
-        result[i - 1]+= value;
-        result[i] = 0;
-      }
-    });
+    const result = values.slice();
+    if (result.length && result.length > 1) {
+      for (let i = result.length; i >= 0; i--) {
+        const currentValue = result[i];
+        const prevValue = result[i-1];
+        if (prevValue && currentValue === prevValue) {
+          result[i]+= currentValue;
+          result[i-1] = 0;
+        }
+      };
+    }
 
     return result;
   };
@@ -62,23 +66,19 @@ const App = () => {
   const shiftBoard = (axis, direction) => {
     // Получениям ячейки, группированные по линиям нужных направлений
     const lines = getCellsGroupedByCoordinate(axis, cells);
-    const tmp = lines.slice();
-    console.log("line Before", tmp);
-
     // Проходим по каждой линии
     lines.forEach((line, indexLine) => {
-      const isToEndDirection = direction === `start`;
       // Получеем массив value каждой ячейки в линии (Без нулей)
       let values = getLineCellsValues(sortByDirection(line, direction));
       // Если хотя бы в одной ячейки в линии есть value
       if (values.length) {
         // Складываем значения соседних ячеек TODO Правильно ли складывает? НЕПРАВИЛЬНО!
-        // values = sumEqualSiblings(values);
+        const summedValues = sumEqualSiblings(values);
 
         // После сложения, появились нулевые value => убираем их
-        const valuesWithoutZeroes = removeZeroes(values);
+        const valuesWithoutZeroes = removeZeroes(summedValues);
         // Собираем недостающие нули в массив
-        const missingZeros = new Array(line.length - values.length).fill(0);
+        const missingZeros = new Array(line.length - valuesWithoutZeroes.length).fill(0);
 
         // Собираем новый массив value. В зависимости от направления, добавляем нули в конец или начало
         let resultValues = [...missingZeros, ...valuesWithoutZeroes];
@@ -90,13 +90,9 @@ const App = () => {
       }
     });
 
-    const tmp2 = lines.slice();
-    // console.log("line Before", tmp2);
-
-    console.log("line After", lines);
     // TODO Отправляем на сервер обновлённые ячейки, ожидая получить новые, но почему-то получаем не всегда
-    // updateBoardFromServer(lines.flat());
-    setCells(lines.flat());
+    updateBoardFromServer(lines.flat());
+    // setCells(lines.flat());
   };
 
   const onKeyDown = (keyCode) => {
@@ -127,7 +123,8 @@ const App = () => {
 
 
   const updateBoardFromServer = (currentCells = []) => {
-    api.getNewCellsForGameLevel(level, currentCells).then((newCells) => {
+    const nonEmptyCells = currentCells.filter(({value}) => value);
+    api.getNewCellsForGameLevel(level, nonEmptyCells).then((newCells) => {
       const updatedCells = getUpdatedCells(currentCells, newCells);
       setCells(updatedCells);
     });
