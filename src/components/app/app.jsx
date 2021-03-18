@@ -90,9 +90,7 @@ const App = () => {
       }
     });
 
-    // TODO Отправляем на сервер обновлённые ячейки, ожидая получить новые, но почему-то получаем не всегда
     updateBoardFromServer(lines.flat());
-    // setCells(lines.flat());
   };
 
   const onKeyDown = (keyCode) => {
@@ -143,6 +141,7 @@ const App = () => {
 
   useEffect(() => {
     updateBoardFromServer();
+    // eslint-disable-next-line
   }, [backendServers, level]);
 
   return (
