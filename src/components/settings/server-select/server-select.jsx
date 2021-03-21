@@ -8,9 +8,9 @@ const ServerSelect = ({ onChange, options }) => {
         defaultValue={currentServer.value}
         onChange={(evt) => onChange(evt.target.value)}
       >
-        {options.map(({ value, id }, index) => (
+        {options.map(({ value, id, name }, index) => (
           <option id={id} value={value} key={index}>
-            {value}
+            {name}
           </option>
         ))}
       </select>

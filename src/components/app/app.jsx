@@ -1,9 +1,18 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 // import PropTypes from "prop-types";
 import API from "../../api/api";
 import Board from "../board/board";
 import Settings from "../settings/settings";
-import { generateInitialBoardData, isControlKey, isEqual } from "../../utils/utils";
+import {
+  generateInitialBoardData,
+  isControlKey,
+  isEqual,
+  sumEqualSiblings,
+  getCellsGroupedByCoordinate,
+  sortByDirection,
+  getLineCellsValues,
+  removeZeroes,
+} from "../../utils/utils";
 import servers from "../../api/servers";
 
 const App = () => {
@@ -13,50 +22,6 @@ const App = () => {
   const [backendServers, setSelectedBackendServer] = useState(servers);
 
   let api = new API(backendServers.find((server) => server.isSelected).value);
-
-  const getCellsGroupedByCoordinate = (axis, cells) => {
-    const groupedCells = cells.reduce((acc, cell) => {
-      const axisCoordinate = cell[axis];
-
-      if (!acc[axisCoordinate]) {
-        acc[axisCoordinate] = [];
-      }
-
-      return {
-        ...acc,
-        [axisCoordinate]: [
-          ...acc[axisCoordinate],
-          cell
-        ]
-      }
-    }, {});
-
-    return Object.values(groupedCells);
-  }
-
-  const sortByDirection = (line, direction) => {
-    return line.sort((a, b) => a[direction] - b[direction]);
-  };
-
-  const getLineCellsValues = (line) => line.map(({ value }) => value);
-
-  const sumEqualSiblings = (values) => {
-    const result = values.slice();
-    if (result.length && result.length > 1) {
-      for (let i = result.length; i >= 0; i--) {
-        const currentValue = result[i];
-        const prevValue = result[i-1];
-        if (prevValue && currentValue === prevValue) {
-          result[i]+= currentValue;
-          result[i-1] = 0;
-        }
-      }
-    }
-
-    return result;
-  };
-
-  const removeZeroes = (array) => array.filter(value => value);
 
   const shiftBoard = (axis, direction) => {
     let shifted = false;
@@ -113,7 +78,10 @@ const App = () => {
         const valuesWithoutZeroes = removeZeroes(values);
         const summedValues = sumEqualSiblings(valuesWithoutZeroes);
 
-        if (valuesWithoutZeroes.length < values.length || summedValues.includes(0)) {
+        if (
+          valuesWithoutZeroes.length < values.length ||
+          summedValues.includes(0)
+        ) {
           gameIsOver = false;
         }
       });
@@ -122,11 +90,6 @@ const App = () => {
     return gameIsOver;
   };
 
-  const onKeyDown = ({ code }) => {
-    isControlKey(code, (axis, direction) => {
-      shiftBoard(axis, direction);
-    });
-  };
 
   const getUpdatedCells = (currentCells, newCells) => {
     return currentCells.map((cell) => {
@@ -145,9 +108,8 @@ const App = () => {
     });
   };
 
-
   const updateBoardFromServer = (currentCells) => {
-    const nonEmptyCells = currentCells.filter(({value}) => value);
+    const nonEmptyCells = currentCells.filter(({ value }) => value);
     api.getNewCellsForGameLevel(level, nonEmptyCells).then((newCells) => {
       const updatedCells = getUpdatedCells(currentCells, newCells);
       setCells(updatedCells);
@@ -166,58 +128,69 @@ const App = () => {
   };
 
   const setLevelFromAnchor = () => {
-    const {hash} = window.location;
+    const { hash } = window.location;
     if (hash && hash.includes(`#test`)) {
-      const newLevel = +hash.replace(/\D/g,'');
+      const newLevel = +hash.replace(/\D/g, "");
       setLevel(newLevel);
     }
   };
 
-  useEffect(() => {
+  /*
+  * Handlers
+  * */
+  const onMount = () => {
     setLevelFromAnchor();
+  };
 
-  }, []);
+  const onKeyDown = ({ code }) => {
+    isControlKey(code, (axis, direction) => {
+      shiftBoard(axis, direction);
+    });
+  };
 
+  const onCellsChange = () => {
+    if (cells.length) {
+      const isGameOver = checkGameOver();
 
-  useEffect(() => {
+      if (isGameOver) {
+        setStatus(`game-over`);
+      }
+    }
+  };
+
+  const onSettingsChange = () => {
     if (!!level) {
       const newCells = generateInitialBoardData(level);
       updateBoardFromServer(newCells);
 
       setStatus(`playing`);
     }
-    // eslint-disable-next-line
-  }, [backendServers, level]);
+  };
 
-  useEffect(() => {
+  /*
+  * Use effects
+  * */
+  useEffect(onMount, []);
+  useEffect(onCellsChange, [cells]);
+  useEffect(onSettingsChange, [backendServers, level]);
 
-
-    const isGameOver = checkGameOver();
-
-    if (isGameOver) {
-      setStatus(`game-over`);
-    }
-  }, [cells])
-
+  /*
+  * Template
+  * */
   return (
-    <section
-      className="game"
-      role="application"
-      aria-label="Hexagonal 2048"
-    >
+    <section className="game" role="application" aria-label="Hexagonal 2048">
       <Settings
         backendServers={backendServers}
         onServerChange={updateBackendServer}
         onLevelChange={setLevel}
         level={level}
       />
-      {!!level && <Board
-          onKeyDown={onKeyDown}
-          tabIndex={0}
-          cells={cells}
-          level={level}
-      />}
-      <div>Game Status: <span data-status={status}>{status}</span></div>
+      {!!level && (
+        <Board onKeyDown={onKeyDown} tabIndex={0} cells={cells} level={level} />
+      )}
+      <div role="alert">
+        Game Status: <span data-status={status}>{status}</span>
+      </div>
     </section>
   );
 };
