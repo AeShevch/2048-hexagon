@@ -13,7 +13,7 @@ import {
 } from "../../business-logic/business-logic";
 
 import { getSelected } from "../../utils/utils";
-import servers from "../../api/servers";
+import servers from "../../api/servers/servers";
 import { GameStatuses } from "../../const";
 
 const App = () => {

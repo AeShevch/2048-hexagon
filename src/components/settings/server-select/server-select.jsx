@@ -1,3 +1,5 @@
+import serverSelectPropTypes from "./server-select.prop";
+
 import { getSelected } from "../../../utils/utils";
 
 const ServerSelect = ({ onServerChange, backendServers }) => {
@@ -5,7 +7,7 @@ const ServerSelect = ({ onServerChange, backendServers }) => {
 
   const onChange = (evt) =>
     onServerChange(
-        backendServers.map((server) => ({
+      backendServers.map((server) => ({
         ...server,
         isSelected: server.url === evt.target.value,
       }))
@@ -19,8 +21,8 @@ const ServerSelect = ({ onServerChange, backendServers }) => {
         defaultValue={currentServer.url}
         onChange={onChange}
       >
-        {backendServers.map(({ url, id, name }, index) => (
-          <option id={id} value={url} key={index}>
+        {backendServers.map(({ url, id, name }) => (
+          <option id={id} value={url} key={url}>
             {name}
           </option>
         ))}
@@ -30,3 +32,5 @@ const ServerSelect = ({ onServerChange, backendServers }) => {
 };
 
 export default ServerSelect;
+
+ServerSelect.propTypes = serverSelectPropTypes;

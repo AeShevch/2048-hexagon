@@ -1,21 +1,20 @@
 import Cell from "./cell/cell";
-import {GameStatuses} from "../../const";
+import { GameStatuses } from "../../const";
 
 // import PropTypes from "prop-types";
 
-const Board = ({cells, level, status, onKeyDown}) => {
+const Board = ({ cells, level, status, onKeyDown }) => {
   const boardWidth = parseInt(
-    getComputedStyle(document.documentElement).getPropertyValue(
-      "--board-width"
-    )
+    getComputedStyle(document.documentElement).getPropertyValue("--board-width")
   );
 
   const hexagonSize = boardWidth / (level * 2 + (level - 1));
   const hexagonWidth = hexagonSize * 2;
-  const hexagonHeight = Math.sqrt(3) / 2 * hexagonWidth;
+  const hexagonHeight = (Math.sqrt(3) / 2) * hexagonWidth;
 
   return (
     <section
+      id="game-board"
       {...(status !== GameStatuses.VICTORY ? { onKeyDown } : {})}
       tabIndex={0}
       ref={(board) => board && board.focus()}
@@ -25,9 +24,7 @@ const Board = ({cells, level, status, onKeyDown}) => {
     >
       {cells.map(({ x, y, z, value }, index) => (
         <Cell
-          x={x}
-          y={y}
-          z={z}
+          x={x} y={y} z={z}
           value={value}
           width={hexagonWidth}
           height={hexagonHeight}

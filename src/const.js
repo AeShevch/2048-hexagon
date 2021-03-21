@@ -5,4 +5,4 @@ export const GameStatuses = {
     VICTORY: `victory`,
 };
 
-export const WIN_VALUE = 128;
+export const WIN_VALUE = 2048;
