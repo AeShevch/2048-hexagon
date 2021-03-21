@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 // import PropTypes from "prop-types";
 import API from "../../api/api";
 import Board from "../board/board";
 import Settings from "../settings/settings";
-import { generateInitialBoardData, isControlKey } from "../../utils/utils";
+import { generateInitialBoardData, isControlKey, isEqual } from "../../utils/utils";
 import servers from "../../api/servers";
 
 const App = () => {
+  const [status, setStatus] = useState(`settings`);
   const [level, setLevel] = useState(0);
   const [cells, setCells] = useState([]);
   const [backendServers, setSelectedBackendServer] = useState(servers);
@@ -37,13 +38,7 @@ const App = () => {
     return line.sort((a, b) => a[direction] - b[direction]);
   };
 
-  const getLineCellsValues = (line) =>
-    line.reduce((accum, { value }) => {
-      if (value) {
-        accum.push(value);
-      }
-      return accum;
-    }, []);
+  const getLineCellsValues = (line) => line.map(({ value }) => value);
 
   const sumEqualSiblings = (values) => {
     const result = values.slice();
@@ -55,7 +50,7 @@ const App = () => {
           result[i]+= currentValue;
           result[i-1] = 0;
         }
-      };
+      }
     }
 
     return result;
@@ -64,45 +59,76 @@ const App = () => {
   const removeZeroes = (array) => array.filter(value => value);
 
   const shiftBoard = (axis, direction) => {
+    let shifted = false;
     // Получениям ячейки, группированные по линиям нужных направлений
     const lines = getCellsGroupedByCoordinate(axis, cells);
     // Проходим по каждой линии
     lines.forEach((line, indexLine) => {
       // Получеем массив value каждой ячейки в линии (Без нулей)
-      let values = getLineCellsValues(sortByDirection(line, direction));
+      const sortedLine = sortByDirection(line, direction);
+      const values = getLineCellsValues(sortedLine);
+      const valuesWithoutZeroes = removeZeroes(values);
+
       // Если хотя бы в одной ячейки в линии есть value
-      if (values.length) {
-        // Складываем значения соседних ячеек TODO Правильно ли складывает? НЕПРАВИЛЬНО!
-        const summedValues = sumEqualSiblings(values);
+      if (valuesWithoutZeroes.length) {
+        // Складываем значения соседних ячеек
+        const summedValues = sumEqualSiblings(valuesWithoutZeroes);
 
         // После сложения, появились нулевые value => убираем их
-        const valuesWithoutZeroes = removeZeroes(summedValues);
+        const newValuesWithoutZeroes = removeZeroes(summedValues);
+
         // Собираем недостающие нули в массив
-        const missingZeros = new Array(line.length - valuesWithoutZeroes.length).fill(0);
+        const missingZeros = new Array(
+          line.length - newValuesWithoutZeroes.length
+        ).fill(0);
 
         // Собираем новый массив value. В зависимости от направления, добавляем нули в конец или начало
-        let resultValues = [...missingZeros, ...valuesWithoutZeroes];
+        let resultValues = [...missingZeros, ...newValuesWithoutZeroes];
 
-        // Обновляем исходный массив ячеек новыми value indexValue равен индексу ячейки
-        resultValues.forEach((value, indexValue) => {
-          lines[indexLine][indexValue].value = value;
-        });
+        if (!isEqual(values, resultValues)) {
+          shifted = true;
+
+          // Обновляем исходный массив ячеек новыми value indexValue равен индексу ячейки
+          resultValues.forEach((value, indexValue) => {
+            lines[indexLine][indexValue].value = value;
+          });
+        }
       }
     });
 
-    updateBoardFromServer(lines.flat());
+    if (shifted) {
+      updateBoardFromServer(lines.flat());
+    }
   };
 
-  const onKeyDown = (keyCode) => {
-    isControlKey(keyCode, (axis, direction) => {
-      shiftBoard(axis, direction);
+  const checkGameOver = () => {
+    let gameIsOver = true;
 
+    [`x`, `y`, `z`].forEach((axis) => {
+      const lines = getCellsGroupedByCoordinate(axis, cells);
+
+      lines.forEach((line) => {
+        const sortedLine = sortByDirection(line, axis);
+        const values = getLineCellsValues(sortedLine);
+        const valuesWithoutZeroes = removeZeroes(values);
+        const summedValues = sumEqualSiblings(valuesWithoutZeroes);
+
+        if (valuesWithoutZeroes.length < values.length || summedValues.includes(0)) {
+          gameIsOver = false;
+        }
+      });
+    });
+
+    return gameIsOver;
+  };
+
+  const onKeyDown = ({ code }) => {
+    isControlKey(code, (axis, direction) => {
+      shiftBoard(axis, direction);
     });
   };
 
   const getUpdatedCells = (currentCells, newCells) => {
-    if (!currentCells.length) currentCells = generateInitialBoardData(level);
-
     return currentCells.map((cell) => {
       const correspondingCell = newCells.find(
         ({ x, y, z }) => x === cell.x && y === cell.y && z === cell.z
@@ -120,7 +146,7 @@ const App = () => {
   };
 
 
-  const updateBoardFromServer = (currentCells = []) => {
+  const updateBoardFromServer = (currentCells) => {
     const nonEmptyCells = currentCells.filter(({value}) => value);
     api.getNewCellsForGameLevel(level, nonEmptyCells).then((newCells) => {
       const updatedCells = getUpdatedCells(currentCells, newCells);
@@ -139,15 +165,42 @@ const App = () => {
     api = new API(newServerUrl);
   };
 
+  const setLevelFromAnchor = () => {
+    const {hash} = window.location;
+    if (hash && hash.includes(`#test`)) {
+      const newLevel = +hash.replace(/\D/g,'');
+      setLevel(newLevel);
+    }
+  };
+
   useEffect(() => {
-    updateBoardFromServer();
+    setLevelFromAnchor();
+
+  }, []);
+
+
+  useEffect(() => {
+    if (!!level) {
+      const newCells = generateInitialBoardData(level);
+      updateBoardFromServer(newCells);
+
+      setStatus(`playing`);
+    }
     // eslint-disable-next-line
   }, [backendServers, level]);
 
+  useEffect(() => {
+
+
+    const isGameOver = checkGameOver();
+
+    if (isGameOver) {
+      setStatus(`game-over`);
+    }
+  }, [cells])
+
   return (
     <section
-      tabIndex={0}
-      onKeyDown={({ code }) => onKeyDown(code)}
       className="game"
       role="application"
       aria-label="Hexagonal 2048"
@@ -156,8 +209,15 @@ const App = () => {
         backendServers={backendServers}
         onServerChange={updateBackendServer}
         onLevelChange={setLevel}
+        level={level}
       />
-      {!!level && <Board cells={cells} level={level} />}
+      {!!level && <Board
+          onKeyDown={onKeyDown}
+          tabIndex={0}
+          cells={cells}
+          level={level}
+      />}
+      <div>Game Status: <span data-status={status}>{status}</span></div>
     </section>
   );
 };

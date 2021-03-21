@@ -8,9 +8,7 @@ const Cell = ({ x, y, z, value, width, height }) => {
     <div
       className="board__cell"
       aria-label={`Game cell – x:${x}, y: ${y}, z: ${z}, value: ${value}`}
-      data-x={x}
-      data-y={y}
-      data-z={z}
+      data-x={x} data-y={y} data-z={z}
       data-value={value}
       style={{
         width: `${width}em`,

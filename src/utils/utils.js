@@ -46,3 +46,7 @@ export const isControlKey = (keyCode, action) => {
     action(...getKeyInfo(keyCode));
   }
 };
+
+export const isEqual = (x, y) => {
+  return JSON.stringify(x) === JSON.stringify(y);
+}

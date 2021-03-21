@@ -1,4 +1,4 @@
-const LevelSelect = ({ onChange }) => {
+const LevelSelect = ({ onChange, currentLevel }) => {
   const levels = [2, 3, 4];
   return (
     <fieldset
@@ -12,6 +12,7 @@ const LevelSelect = ({ onChange }) => {
             <input
               id={`radio-level-${level}`}
               value={level}
+              defaultChecked={currentLevel === level}
               name="set-level-radio"
               type="radio"
             />
