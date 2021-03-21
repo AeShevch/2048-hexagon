@@ -15,7 +15,6 @@ const Cell = ({ x, y, z, value, width, height }) => {
       style={{
         width: `${width}em`,
         height: `${height}em`,
-        // Сдвиг от центра доски
         transform: `translateY(${cellShiftVertical}em) translateX(${cellShiftHorizontal}em)`,
       }}
     >

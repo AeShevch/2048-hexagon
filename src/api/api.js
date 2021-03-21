@@ -1,15 +1,9 @@
-// Методы для запросов по сети
-const Method = {
-  GET: `GET`,
-  POST: `POST`,
-  PUT: `PUT`,
-  DELETE: `DELETE`,
-};
+import {Method} from "../const";
 
 /**
- * Проверка ответа сервера
- * @param {Response} response - Ответ сервера
- * @return {Response|Error} - Обработанный статус ответа сервера
+ * Checking the server response
+ * @param {Response} response - server response
+ * @return {Response|Error} - Processed status of the server response
  */
 const checkStatus = (response) => {
   if (response.status >= 200 && response.status < 300) {
@@ -19,11 +13,13 @@ const checkStatus = (response) => {
   }
 };
 
-/** Класс для работы с сетью */
+/**
+ * Class for working with the server
+ */
 export default class API {
   /**
    * @constructor
-   * @param {String} endPoint - Адрес сервера
+   * @param {String} endPoint - server url
    */
   constructor(endPoint) {
     this._endPoint = endPoint;
@@ -34,26 +30,26 @@ export default class API {
   }
 
   /**
-   * Запрос новых ячеек для поля с указанным радиусом
-   * @param {Number} level - Радиус поля (Уровень игры)
-   * @param {Array} currentBoardData - Радиус поля (Уровень игры)
+   * Request new cells for a board with the specified radius
+   * @param {Number} level - Game level (Radius)
+   * @param {{x: Number, y: Number, z: Number, value: Number}[]} nonEmptyCells - Non-empty cells
    * @returns {Promise<any>}
    */
-  getNewCellsForGameLevel(level, currentBoardData = []) {
+  getNewCellsForGameLevel(level, nonEmptyCells = []) {
     return this._load({
       url: level.toString(),
       method: Method.POST,
-      body: JSON.stringify(currentBoardData),
+      body: JSON.stringify(nonEmptyCells),
     }).then((response) => response.json());
   }
 
   /**
-   * Метод для работы с сетью
-   * @param {String} url - URL запроса
-   * @param {String} method - Метод запрса
-   * @param {String} body - Тело запроса
-   * @param {Headers} headers - Заголовки запроса
-   * @return {Promise<Response>} - Промис работы с методом
+   * Makes a server request
+   * @param {String} url - Request url
+   * @param {String} method - Request method
+   * @param {String} body - Request body
+   * @param {Headers} headers - Request headers
+   * @return {Promise<Response>}
    * @private
    */
   _load({ url, method = Method.GET, body = null, headers = new Headers() }) {
