@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import cellPropTypes from "./cell.prop";
 import {calcCellShiftHorizontal, calcCellShiftVertical} from "../../../business-logic/business-logic";
 
@@ -25,4 +26,8 @@ const Cell = ({ x, y, z, value, width, height }) => {
 
 export default Cell;
 
-Cell.propTypes = cellPropTypes;
+Cell.propTypes = {
+    ...cellPropTypes,
+    width: PropTypes.number.isRequired,
+    height: PropTypes.number.isRequired,
+};

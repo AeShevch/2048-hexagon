@@ -44,8 +44,8 @@ const App = () => {
   };
 
   const onKeyDown = ({ code }) => {
-    isControlKey(code, (axis, direction) => {
-      shiftBoard(axis, direction, cells, (shiftedCells) => {
+    isControlKey(code, (unchangingAxis, increasingAxis) => {
+      shiftBoard(unchangingAxis, increasingAxis, cells, (shiftedCells) => {
         getUpdatedCells(api, shiftedCells, level).then((updatedCells) =>
           setCells(updatedCells)
         );
