@@ -6,7 +6,7 @@ const LevelSelect = ({ onChange, currentLevel }) => (
     className="settings__level fieldset"
     onChange={({ target }) => onChange(+target.value)}
   >
-    <legend>Choose game level</legend>
+    <legend>Choose game level:</legend>
     <div className="fieldset__inner">
       {BASE_LEVELS.map((level) => (
         <div className="custom-radio" key={level}>

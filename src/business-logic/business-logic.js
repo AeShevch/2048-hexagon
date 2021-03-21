@@ -1,6 +1,16 @@
 import { isEqual, removeZeroes } from "../utils/utils";
 import { WIN_VALUE } from "../const";
 
+export const calcCellWidth = (boardWidth, radius) => {
+  const cellSize = boardWidth / (radius * 2 + (radius - 1));
+  return cellSize * 2;
+};
+
+export const calcCellHeight = (cellWidth) => (Math.sqrt(3) / 2) * cellWidth;
+
+export const calcCellShiftVertical = (z, x, height) => (z + x / 2) * height;
+export const calcCellShiftHorizontal = (x, width) => (x * width * 3) / 4;
+
 export const generateInitialBoardData = (level) => {
   const results = [];
   const n = level - 1;

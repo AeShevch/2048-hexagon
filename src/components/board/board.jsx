@@ -1,16 +1,17 @@
+import boardPropTypes from "./board.prop";
 import Cell from "./cell/cell";
-import { GameStatuses } from "../../const";
+import { GameStatuses, BOARD_CSS_VARIABLE_NAME } from "../../const";
+import {calcCellWidth, calcCellHeight} from "../../business-logic/business-logic";
 
-// import PropTypes from "prop-types";
 
 const Board = ({ cells, level, status, onKeyDown }) => {
+  // Getting the width of the board from the css variable "--board-width"
   const boardWidth = parseInt(
-    getComputedStyle(document.documentElement).getPropertyValue("--board-width")
+    getComputedStyle(document.documentElement).getPropertyValue(BOARD_CSS_VARIABLE_NAME)
   );
 
-  const hexagonSize = boardWidth / (level * 2 + (level - 1));
-  const hexagonWidth = hexagonSize * 2;
-  const hexagonHeight = (Math.sqrt(3) / 2) * hexagonWidth;
+  const cellWidth = calcCellWidth(boardWidth, level);
+  const cellHeight = calcCellHeight(cellWidth);
 
   return (
     <section
@@ -22,13 +23,13 @@ const Board = ({ cells, level, status, onKeyDown }) => {
       className="board"
       aria-label="Game Board"
     >
-      {cells.map(({ x, y, z, value }, index) => (
+      {cells.map(({ x, y, z, value }) => (
         <Cell
           x={x} y={y} z={z}
           value={value}
-          width={hexagonWidth}
-          height={hexagonHeight}
-          key={index}
+          width={cellWidth}
+          height={cellHeight}
+          key={`${x}${y}${z}`}
         />
       ))}
     </section>
@@ -36,3 +37,5 @@ const Board = ({ cells, level, status, onKeyDown }) => {
 };
 
 export default Board;
+
+Board.propTypes = boardPropTypes;

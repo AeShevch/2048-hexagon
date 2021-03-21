@@ -1,8 +1,9 @@
-const Cell = ({ x, y, z, value, width, height }) => {
-  const cellShiftVertical = (z + x / 2) * height;
-  const cellShiftHorizontal = (x * width * 3) / 4;
+import cellPropTypes from "./cell.prop";
+import {calcCellShiftHorizontal, calcCellShiftVertical} from "../../../business-logic/business-logic";
 
-  const cellValue = !!value ? value : ``;
+const Cell = ({ x, y, z, value, width, height }) => {
+  const cellShiftVertical = calcCellShiftVertical(z, x, height);
+  const cellShiftHorizontal = calcCellShiftHorizontal(x, width);
 
   return (
     <div
@@ -17,9 +18,11 @@ const Cell = ({ x, y, z, value, width, height }) => {
         transform: `translateY(${cellShiftVertical}em) translateX(${cellShiftHorizontal}em)`,
       }}
     >
-      <b style={{ color: "white" }}>{cellValue}</b>
+      <b style={{ color: "white" }}>{!!value && value}</b>
     </div>
   );
 };
 
 export default Cell;
+
+Cell.propTypes = cellPropTypes;

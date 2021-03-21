@@ -8,3 +8,5 @@ export const GameStatuses = {
 export const WIN_VALUE = 2048;
 
 export const BASE_LEVELS = [2, 3, 4, 5, 6];
+
+export const BOARD_CSS_VARIABLE_NAME = `--board-width`;
