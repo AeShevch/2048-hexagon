@@ -5,8 +5,8 @@ const Settings = ({onLevelChange, onServerChange, backendServers, level}) => {
     return (
       <form className="settings" aria-label="Game settings">
           <ServerSelect
-              onChange={onServerChange}
-              options={backendServers}
+              onServerChange={onServerChange}
+              backendServers={backendServers}
           />
           <LevelSelect onChange={onLevelChange} currentLevel={level}/>
       </form>

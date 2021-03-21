@@ -29,6 +29,10 @@ export default class API {
     this._endPoint = endPoint;
   }
 
+  endPointChange(newEndPoint) {
+    this._endPoint = newEndPoint;
+  }
+
   /**
    * Запрос новых ячеек для поля с указанным радиусом
    * @param {Number} level - Радиус поля (Уровень игры)

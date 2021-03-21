@@ -1,8 +1,9 @@
-// import PropTypes from "prop-types";
 import Cell from "./cell/cell";
-import React from "react";
+import {GameStatuses} from "../../const";
 
-const Board = ({cells, level, onKeyDown}) => {
+// import PropTypes from "prop-types";
+
+const Board = ({cells, level, status, onKeyDown}) => {
   const boardWidth = parseInt(
     getComputedStyle(document.documentElement).getPropertyValue(
       "--board-width"
@@ -15,7 +16,7 @@ const Board = ({cells, level, onKeyDown}) => {
 
   return (
     <section
-      onKeyDown={onKeyDown}
+      {...(status !== GameStatuses.VICTORY ? { onKeyDown } : {})}
       tabIndex={0}
       ref={(board) => board && board.focus()}
       autoFocus={true}
@@ -24,7 +25,9 @@ const Board = ({cells, level, onKeyDown}) => {
     >
       {cells.map(({ x, y, z, value }, index) => (
         <Cell
-          x={x} y={y} z={z}
+          x={x}
+          y={y}
+          z={z}
           value={value}
           width={hexagonWidth}
           height={hexagonHeight}
