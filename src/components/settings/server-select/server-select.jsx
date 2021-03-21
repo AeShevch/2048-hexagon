@@ -1,5 +1,4 @@
 import serverSelectPropTypes from "./server-select.prop";
-
 import { getSelected } from "../../../utils/utils";
 
 const ServerSelect = ({ onServerChange, backendServers }) => {
