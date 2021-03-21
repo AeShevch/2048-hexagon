@@ -8,9 +8,11 @@ const Cell = ({ x, y, z, value, width, height }) => {
 
   return (
     <div
-      className="board__cell"
+      className={`board__cell cell cell_${value}`}
       aria-label={`Game cell – x:${x}, y: ${y}, z: ${z}, value: ${value}`}
-      data-x={x} data-y={y} data-z={z}
+      data-x={x}
+      data-y={y}
+      data-z={z}
       data-value={value}
       style={{
         width: `${width}em`,
@@ -18,7 +20,7 @@ const Cell = ({ x, y, z, value, width, height }) => {
         transform: `translateY(${cellShiftVertical}em) translateX(${cellShiftHorizontal}em)`,
       }}
     >
-      <b style={{ color: "white" }}>{!!value && value}</b>
+      <b className="cell__value">{!!value && value}</b>
     </div>
   );
 };
