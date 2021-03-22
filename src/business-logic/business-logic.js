@@ -232,7 +232,6 @@ export const getLineCellsValues = (line) => line.map(({ value }) => value);
 export const checkGameOver = (cells) => {
   let gameIsOver = true;
 
-
   Object.values(keyCodeToAxis).forEach(({ unchangingAxis, increasingAxis }) => {
     const lines = getCellsGroupedByCoordinate(unchangingAxis, cells);
 
