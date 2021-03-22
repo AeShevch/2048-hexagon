@@ -11,8 +11,6 @@ export const BASE_LEVELS = [2, 3, 4, 5, 6];
 
 export const BOARD_CSS_VARIABLE_NAME = `--board-width`;
 
-export const AXES = [`x`, `y`, `z`];
-
 export const Method = {
     GET: `GET`,
     POST: `POST`,

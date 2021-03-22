@@ -1,5 +1,5 @@
 import { isEqual, removeZeroes } from "../utils/utils";
-import { WIN_VALUE, AXES } from "../const";
+import { WIN_VALUE } from "../const";
 
 /**
  * Calculates the width of a hexagonal cell
@@ -232,15 +232,15 @@ export const getLineCellsValues = (line) => line.map(({ value }) => value);
 export const checkGameOver = (cells) => {
   let gameIsOver = true;
 
-  AXES.forEach((axis) => {
-    const lines = getCellsGroupedByCoordinate(axis, cells);
+
+  Object.values(keyCodeToAxis).forEach(({ unchangingAxis, increasingAxis }) => {
+    const lines = getCellsGroupedByCoordinate(unchangingAxis, cells);
 
     lines.forEach((line) => {
-      const sortedLine = sortByDirection(line, axis);
+      const sortedLine = sortByDirection(line, increasingAxis);
       const values = getLineCellsValues(sortedLine);
       const valuesWithoutZeroes = removeZeroes(values);
       const summedValues = sumEqualSiblings(valuesWithoutZeroes);
-
 
       if (
         valuesWithoutZeroes.length < values.length ||
