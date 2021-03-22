@@ -68,7 +68,7 @@ export const generateInitialBoardData = (radius) => {
 /**
  * Matching the pressed key to the axis
  *
- * Each increasingAxis corresponds to two axis:
+ * Each control key corresponds to two axis:
  * "unchangingAxis" - the name of the axis, the coordinate of which does not change when shifting
  * and "increasingAxis" - the name of the axis, the coordinate of which changes by +1
  *
