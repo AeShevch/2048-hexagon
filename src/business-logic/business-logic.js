@@ -241,9 +241,11 @@ export const checkGameOver = (cells) => {
       const valuesWithoutZeroes = removeZeroes(values);
       const summedValues = sumEqualSiblings(valuesWithoutZeroes);
 
+
       if (
         valuesWithoutZeroes.length < values.length ||
-        summedValues.includes(0)
+        summedValues.includes(0) ||
+        values.includes(0)
       ) {
         gameIsOver = false;
       }
