@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import API from "../../api/api";
 import Board from "../board/board";
 import Settings from "../settings/settings";
+import Status from "../status/status";
 import {
   generateInitialBoardData,
   isControlKey,
@@ -15,6 +16,7 @@ import {
 import { getSelected } from "../../utils/utils";
 import servers from "../../api/servers/servers";
 import { GameStatuses } from "../../const";
+import "./app.scss";
 
 const App = () => {
   /*
@@ -107,6 +109,7 @@ const App = () => {
         onLevelChange={setLevel}
         level={level}
       />
+      <Status status={status}/>
       {!!level && (
         <Board
           onKeyDown={onKeyDown}
@@ -115,9 +118,6 @@ const App = () => {
           status={status}
         />
       )}
-      <div role="alert">
-        Game Status: <span data-status={status}>{status}</span>
-      </div>
     </section>
   );
 };

@@ -1,0 +1,11 @@
+.settings {
+  margin-bottom: 2em;
+  padding: 1.5em;
+  border: 1px solid #dee2e6;
+  border-radius: 3px;
+
+  &__backend-url-select {
+    margin-bottom: 2em;
+    display: block;
+  }
+}

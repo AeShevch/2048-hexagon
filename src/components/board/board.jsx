@@ -1,3 +1,4 @@
+import "./board.scss";
 import boardPropTypes from "./board.prop";
 import Cell from "./cell/cell";
 import { GameStatuses, BOARD_CSS_VARIABLE_NAME } from "../../const";

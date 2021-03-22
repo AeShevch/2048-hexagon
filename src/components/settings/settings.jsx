@@ -3,6 +3,8 @@ import settingsPropTypes from "./settings.prop";
 import ServerSelect from "./server-select/server-select";
 import LevelSelect from "./level-select/level-select";
 
+import "./settings.scss";
+
 const Settings = ({ onLevelChange, onServerChange, backendServers, level }) => {
   return (
     <form

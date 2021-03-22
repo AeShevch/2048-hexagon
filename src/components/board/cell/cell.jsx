@@ -1,3 +1,4 @@
+import "./cell.scss";
 import PropTypes from "prop-types";
 import cellPropTypes from "./cell.prop";
 import {calcCellShiftHorizontal, calcCellShiftVertical} from "../../../business-logic/business-logic";
