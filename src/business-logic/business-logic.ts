@@ -9,7 +9,7 @@ import { WIN_VALUE } from "../const";
  *
  * @see {@link https://www.redblobgames.com/grids/hexagons/}
  */
-export const calcCellWidth = (boardWidth, radius) => {
+export const calcCellWidth = (boardWidth: number, radius: number): number => {
   const cellSize = boardWidth / (radius * 2 + (radius - 1));
   return cellSize * 2;
 };
@@ -21,7 +21,8 @@ export const calcCellWidth = (boardWidth, radius) => {
  *
  * @see {@link https://www.redblobgames.com/grids/hexagons/}
  */
-export const calcCellHeight = (cellWidth) => (Math.sqrt(3) / 2) * cellWidth;
+export const calcCellHeight = (cellWidth: number): number =>
+  (Math.sqrt(3) / 2) * cellWidth;
 
 /**
  * Calculates the vertical offset of the cell from the center of the board
@@ -32,7 +33,11 @@ export const calcCellHeight = (cellWidth) => (Math.sqrt(3) / 2) * cellWidth;
  *
  * @see {@link https://www.redblobgames.com/grids/hexagons/}
  */
-export const calcCellShiftVertical = (z, x, height) => (z + x / 2) * height;
+export const calcCellShiftVertical = (
+  z: number,
+  x: number,
+  height: number
+): number => (z + x / 2) * height;
 
 /**
  * Calculates the horizontal offset of the cell from the center of the board
@@ -42,7 +47,8 @@ export const calcCellShiftVertical = (z, x, height) => (z + x / 2) * height;
  *
  * @see {@link https://www.redblobgames.com/grids/hexagons/}
  */
-export const calcCellShiftHorizontal = (x, width) => (x * width * 3) / 4;
+export const calcCellShiftHorizontal = (x: number, width: number): number =>
+  (x * width * 3) / 4;
 
 /**
  * Generates cells with empty values for the board of the specified radius
@@ -51,7 +57,9 @@ export const calcCellShiftHorizontal = (x, width) => (x * width * 3) / 4;
  *
  * @see {@link https://www.redblobgames.com/grids/hexagons/}
  */
-export const generateInitialBoardData = (radius) => {
+export const generateInitialBoardData = (
+  radius: number
+): { x: Number; y: Number; z: Number; value: Number }[] => {
   const results = [];
   const n = radius - 1;
 
@@ -73,7 +81,7 @@ export const generateInitialBoardData = (radius) => {
  * and "increasingAxis" - the name of the axis, the coordinate of which changes by +1
  *
  */
-const keyCodeToAxis = {
+const keyCodeToAxis: Object = {
   KeyQ: {
     unchangingAxis: "z",
     increasingAxis: "y",
@@ -109,14 +117,25 @@ const keyCodeToAxis = {
  * // returns ["x", "y"]
  * getKeyInfo('KeyW');
  */
-const getKeyInfo = (keyCode) => Object.values(keyCodeToAxis[keyCode]);
+const getKeyInfo = (
+  keyCode: string
+): { unchangingAxis: string; increasingAxis: string }[] =>
+  Object.values(keyCodeToAxis[keyCode]);
 
 /**
  * Checks whether one of the control keys was pressed, executes a callback if true
  * @param {String} keyCode - evt.code of pressed key
  * @param {function(unchangingAxis:string, increasingAxis:string)} callback - executes if one of the control keys was pressed
  */
-export const isControlKey = (keyCode, callback) => {
+export const isControlKey = (
+  keyCode: string,
+  callback: (
+    arg0: unchangingAxis,
+    arg1: string,
+    arg2: increasingAxis,
+    arg3: string
+  ) => any
+) => {
   if (Object.keys(keyCodeToAxis).includes(keyCode)) {
     callback(...getKeyInfo(keyCode));
   }
@@ -139,7 +158,7 @@ export const isControlKey = (keyCode, callback) => {
  * // returns [2, 4, 2]
  * sumEqualSiblings([2, 4, 2]);
  */
-export const sumEqualSiblings = (values) => {
+export const sumEqualSiblings = (values: number[]): number[] => {
   const result = values.slice();
 
   if (result.length && result.length > 1) {
@@ -190,7 +209,10 @@ export const sumEqualSiblings = (values) => {
  *   {"x": 1, "y": 0, "z": -1, "value": 2}
  *   ]);
  */
-export const getCellsGroupedByCoordinate = (unchangingAxis, cells) => {
+export const getCellsGroupedByCoordinate = (
+  unchangingAxis: string,
+  cells: { x: number; y: number; z: number; value: number }[]
+): { x: number; y: number; z: number; value: number }[][] => {
   const groupedCells = cells.reduce((acc, cell) => {
     const axisCoordinate = cell[unchangingAxis];
 
@@ -202,7 +224,6 @@ export const getCellsGroupedByCoordinate = (unchangingAxis, cells) => {
       ...acc,
       [axisCoordinate]: [...acc[axisCoordinate], cell],
     };
-
   }, {});
 
   return Object.values(groupedCells);
@@ -214,7 +235,10 @@ export const getCellsGroupedByCoordinate = (unchangingAxis, cells) => {
  * @param {("x"|"y"|"z")} increasingAxis
  * @returns {{x: Number, y: Number, z: Number, value: Number}[]}
  */
-export const sortByDirection = (line, increasingAxis) =>
+export const sortByDirection = (
+  line: { x: number; y: number; z: number; value: number }[],
+  increasingAxis: "x" | "y" | "z"
+): { x: number; y: number; z: number; value: number }[] =>
   line.sort((a, b) => a[increasingAxis] - b[increasingAxis]);
 
 /**
@@ -222,14 +246,18 @@ export const sortByDirection = (line, increasingAxis) =>
  * @param {{x: Number, y: Number, z: Number, value: Number}[]} line
  * @returns {Number[]}
  */
-export const getLineCellsValues = (line) => line.map(({ value }) => value);
+export const getLineCellsValues = (
+  line: { x: number; y: number; z: number; value: number }[]
+): number[] => line.map(({ value }) => value);
 
 /**
  * Checks if there are still possible shifts
  * @param {{x: Number, y: Number, z: Number, value: Number}[]} cells - Array of cells
  * @returns {boolean}
  */
-export const checkGameOver = (cells) => {
+export const checkGameOver = (
+  cells: { x: number; y: number; z: number; value: number }[]
+): boolean => {
   let gameIsOver = true;
 
   Object.values(keyCodeToAxis).forEach(({ unchangingAxis, increasingAxis }) => {
@@ -259,8 +287,9 @@ export const checkGameOver = (cells) => {
  * @param {{x: Number, y: Number, z: Number, value: Number}[]} cells - Array of cells
  * @returns {boolean}
  */
-export const checkWin = (cells) =>
-  cells.some(({ value }) => value === WIN_VALUE);
+export const checkWin = (
+  cells: { x: number; y: number; z: number; value: number }[]
+): boolean => cells.some(({ value }) => value === WIN_VALUE);
 
 /**
  * Shifts cells, performs a callback if the shift is made
@@ -269,13 +298,17 @@ export const checkWin = (cells) =>
  * @param {{x: Number, y: Number, z: Number, value: Number}[]} cells - Array of cells
  * @param {Function} callback
  */
-export const shiftBoard = (unchangingAxis, increasingAxis, cells, callback) => {
+export const shiftBoard = (
+  unchangingAxis: "x" | "y" | "z",
+  increasingAxis: "x" | "y" | "z",
+  cells: { x: number; y: number; z: number; value: number }[],
+  callback: Function
+) => {
   let shifted = false;
 
   const lines = getCellsGroupedByCoordinate(unchangingAxis, cells);
 
   lines.forEach((line, indexLine) => {
-
     const sortedLine = sortByDirection(line, increasingAxis);
     const values = getLineCellsValues(sortedLine);
     const valuesWithoutZeroes = removeZeroes(values);
@@ -311,7 +344,10 @@ export const shiftBoard = (unchangingAxis, increasingAxis, cells, callback) => {
  * @param {{x: Number, y: Number, z: Number, value: Number}[]} newCells - Array of newCells
  * @returns {{x: Number, y: Number, z: Number, value: Number}[]}
  */
-export const getMergedCells = (currentCells, newCells) => {
+export const getMergedCells = (
+  currentCells: { x: number; y: number; z: number; value: number }[],
+  newCells: { x: number; y: number; z: number; value: number }[]
+): { x: number; y: number; z: number; value: number }[] => {
   return currentCells.map((cell) => {
     const correspondingCell = newCells.find(
       ({ x, y, z }) => x === cell.x && y === cell.y && z === cell.z
@@ -335,7 +371,11 @@ export const getMergedCells = (currentCells, newCells) => {
  * @param {Number} level - Game level (Radius)
  * @returns {Promise<{x: Number, y: Number, z: Number, value: Number}[]>}
  */
-export const getUpdatedCells = (api, currentCells, level) => {
+export const getUpdatedCells = (
+  api: object,
+  currentCells: { x: number; y: number; z: number; value: number }[],
+  level: number
+): Promise<{ x: number; y: number; z: number; value: number }[]> => {
   const nonEmptyCells = currentCells.filter(({ value }) => value);
 
   return api

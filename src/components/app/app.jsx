@@ -11,7 +11,7 @@ import {
   checkWin,
   getUpdatedCells,
   getAnchorValue,
-} from "../../business-logic/business-logic";
+} from "../../business-logic/business-logic.ts";
 
 import { getSelected } from "../../utils/utils";
 import servers from "../../api/servers/servers";
