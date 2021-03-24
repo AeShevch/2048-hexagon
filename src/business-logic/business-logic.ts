@@ -1,6 +1,16 @@
 import { isEqual, removeZeroes } from "../utils/utils";
 import { WIN_VALUE } from "../const";
 
+type ControlKey = "KeyQ" | "KeyW" | "KeyE" | "KeyA" | "KeyS" | "KeyD";
+type Axis = "x" | "y" | "z";
+
+interface Cell {
+  x: number;
+  y: number;
+  z: number;
+  value: number;
+}
+
 /**
  * Calculates the width of a hexagonal cell
  * @param {Number} boardWidth - The width of game board
@@ -57,9 +67,7 @@ export const calcCellShiftHorizontal = (x: number, width: number): number =>
  *
  * @see {@link https://www.redblobgames.com/grids/hexagons/}
  */
-export const generateInitialBoardData = (
-  radius: number
-): { x: Number; y: Number; z: Number; value: Number }[] => {
+export const generateInitialBoardData = (radius: number): Cell[] => {
   const results = [];
   const n = radius - 1;
 
@@ -81,28 +89,33 @@ export const generateInitialBoardData = (
  * and "increasingAxis" - the name of the axis, the coordinate of which changes by +1
  *
  */
-const keyCodeToAxis: Object = {
-  KeyQ: {
+interface AxesForKey {
+  unchangingAxis: Axis;
+  increasingAxis: Axis;
+}
+
+const keyCodeToAxis: Record<ControlKey, AxesForKey> = {
+  "KeyQ": {
     unchangingAxis: "z",
     increasingAxis: "y",
   },
-  KeyW: {
+  "KeyW": {
     unchangingAxis: "x",
     increasingAxis: "y",
   },
-  KeyE: {
+  "KeyE": {
     unchangingAxis: "y",
     increasingAxis: "x",
   },
-  KeyA: {
+  "KeyA": {
     unchangingAxis: "y",
     increasingAxis: "z",
   },
-  KeyS: {
+  "KeyS": {
     unchangingAxis: "x",
     increasingAxis: "z",
   },
-  KeyD: {
+  "KeyD": {
     unchangingAxis: "z",
     increasingAxis: "x",
   },
@@ -111,30 +124,24 @@ const keyCodeToAxis: Object = {
 /**
  * Gets the axes corresponding to the pressed key
  * @param {String} keyCode - evt.code of pressed key
- * @returns {{unchangingAxis: String, increasingAxis: String}[]}
+ * @returns {[String, String]}
  *
  * @example
  * // returns ["x", "y"]
  * getKeyInfo('KeyW');
  */
-const getKeyInfo = (
-  keyCode: string
-): { unchangingAxis: string; increasingAxis: string }[] =>
-  Object.values(keyCodeToAxis[keyCode]);
+const getKeyInfo = (keyCode: ControlKey): [Axis, Axis] =>
+  Object.values(keyCodeToAxis[keyCode]) as [Axis, Axis];
 
 /**
  * Checks whether one of the control keys was pressed, executes a callback if true
  * @param {String} keyCode - evt.code of pressed key
  * @param {function(unchangingAxis:string, increasingAxis:string)} callback - executes if one of the control keys was pressed
  */
+// TODO callback`у нужно указать что возвращает shift
 export const isControlKey = (
-  keyCode: string,
-  callback: (
-    arg0: unchangingAxis,
-    arg1: string,
-    arg2: increasingAxis,
-    arg3: string
-  ) => any
+  keyCode: ControlKey,
+  callback: (arg0: Axis, arg2: Axis) => any
 ) => {
   if (Object.keys(keyCodeToAxis).includes(keyCode)) {
     callback(...getKeyInfo(keyCode));
@@ -210,11 +217,11 @@ export const sumEqualSiblings = (values: number[]): number[] => {
  *   ]);
  */
 export const getCellsGroupedByCoordinate = (
-  unchangingAxis: string,
-  cells: { x: number; y: number; z: number; value: number }[]
-): { x: number; y: number; z: number; value: number }[][] => {
-  const groupedCells = cells.reduce((acc, cell) => {
-    const axisCoordinate = cell[unchangingAxis];
+  unchangingAxis: Axis,
+  cells: Cell[]
+): Cell[][] => {
+  const groupedCells = cells.reduce<Record<string, Cell[]>>((acc, cell) => {
+    const axisCoordinate = cell[unchangingAxis].toString();
 
     if (!acc[axisCoordinate]) {
       acc[axisCoordinate] = [];
@@ -236,10 +243,10 @@ export const getCellsGroupedByCoordinate = (
  * @returns {{x: Number, y: Number, z: Number, value: Number}[]}
  */
 export const sortByDirection = (
-  line: { x: number; y: number; z: number; value: number }[],
-  increasingAxis: "x" | "y" | "z"
-): { x: number; y: number; z: number; value: number }[] =>
-  line.sort((a, b) => a[increasingAxis] - b[increasingAxis]);
+    line: Cell[],
+    increasingAxis: Axis
+): Cell[] =>
+    line.sort((a, b) => a[increasingAxis] - b[increasingAxis]);
 
 /**
  * Converts an array of cells to an array of cell values
@@ -247,7 +254,7 @@ export const sortByDirection = (
  * @returns {Number[]}
  */
 export const getLineCellsValues = (
-  line: { x: number; y: number; z: number; value: number }[]
+  line: Cell[]
 ): number[] => line.map(({ value }) => value);
 
 /**
@@ -255,9 +262,7 @@ export const getLineCellsValues = (
  * @param {{x: Number, y: Number, z: Number, value: Number}[]} cells - Array of cells
  * @returns {boolean}
  */
-export const checkGameOver = (
-  cells: { x: number; y: number; z: number; value: number }[]
-): boolean => {
+export const checkGameOver = (cells: Cell[]): boolean => {
   let gameIsOver = true;
 
   Object.values(keyCodeToAxis).forEach(({ unchangingAxis, increasingAxis }) => {
@@ -287,9 +292,8 @@ export const checkGameOver = (
  * @param {{x: Number, y: Number, z: Number, value: Number}[]} cells - Array of cells
  * @returns {boolean}
  */
-export const checkWin = (
-  cells: { x: number; y: number; z: number; value: number }[]
-): boolean => cells.some(({ value }) => value === WIN_VALUE);
+export const checkWin = (cells: Cell[]): boolean =>
+  cells.some(({ value }) => value === WIN_VALUE);
 
 /**
  * Shifts cells, performs a callback if the shift is made
@@ -299,9 +303,9 @@ export const checkWin = (
  * @param {Function} callback
  */
 export const shiftBoard = (
-  unchangingAxis: "x" | "y" | "z",
-  increasingAxis: "x" | "y" | "z",
-  cells: { x: number; y: number; z: number; value: number }[],
+  unchangingAxis: Axis,
+  increasingAxis: Axis,
+  cells: Cell[],
   callback: Function
 ) => {
   let shifted = false;
@@ -345,9 +349,9 @@ export const shiftBoard = (
  * @returns {{x: Number, y: Number, z: Number, value: Number}[]}
  */
 export const getMergedCells = (
-  currentCells: { x: number; y: number; z: number; value: number }[],
-  newCells: { x: number; y: number; z: number; value: number }[]
-): { x: number; y: number; z: number; value: number }[] => {
+  currentCells: Cell[],
+  newCells: Cell[]
+): Cell[] => {
   return currentCells.map((cell) => {
     const correspondingCell = newCells.find(
       ({ x, y, z }) => x === cell.x && y === cell.y && z === cell.z
@@ -373,21 +377,21 @@ export const getMergedCells = (
  */
 export const getUpdatedCells = (
   api: object,
-  currentCells: { x: number; y: number; z: number; value: number }[],
+  currentCells: Cell[],
   level: number
-): Promise<{ x: number; y: number; z: number; value: number }[]> => {
+): Promise<Cell[]> => {
   const nonEmptyCells = currentCells.filter(({ value }) => value);
 
   return api
     .getNewCellsForGameLevel(level, nonEmptyCells)
-    .then((newCells) => getMergedCells(currentCells, newCells));
+    .then((newCells: Cell[]) => getMergedCells(currentCells, newCells));
 };
 
 /**
  * If the url contains the anchor "#test.." returns the level, if not returns false
  * @returns {boolean|number}
  */
-export const getAnchorValue = () => {
+export const getAnchorValue = (): boolean | number => {
   const { hash } = window.location;
   if (hash && hash.includes(`#test`)) {
     return +hash.replace(/\D/g, ``);
