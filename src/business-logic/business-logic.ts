@@ -4,7 +4,7 @@ import { WIN_VALUE } from "../const";
 type ControlKey = "KeyQ" | "KeyW" | "KeyE" | "KeyA" | "KeyS" | "KeyD";
 type Axis = "x" | "y" | "z";
 
-interface Cell {
+export interface Cell {
   x: number;
   y: number;
   z: number;
@@ -307,7 +307,7 @@ export const shiftBoard = (
   increasingAxis: Axis,
   cells: Cell[],
   callback: Function
-) => {
+):void => {
   let shifted = false;
 
   const lines = getCellsGroupedByCoordinate(unchangingAxis, cells);
@@ -376,7 +376,7 @@ export const getMergedCells = (
  * @returns {Promise<{x: Number, y: Number, z: Number, value: Number}[]>}
  */
 export const getUpdatedCells = (
-  api: object,
+  api: {getNewCellsForGameLevel: Function},// TODO
   currentCells: Cell[],
   level: number
 ): Promise<Cell[]> => {

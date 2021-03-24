@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import API from "../../api/api";
+import API from "../../api/api.ts";
 import Board from "../board/board";
 import Settings from "../settings/settings";
 import Status from "../status/status";
